@@ -49,15 +49,21 @@ export default function Page1() {
 
         await axios(configuration).then((result) => {
             if (result.data.result) {
+                console.log(result.data.result)
                 // setShowAlert(true);
-                toast("done");
+                toast("Creating profile is successful");
                 setOpen(false);
+            }else{
+                setOpen(false);
+                toast.error(result.data.message);
+                setIsSubmitting(false);
             }
             console.log(result);
             setIsSubmitting(false);
         }).catch((error) => {
             console.log(error);
-            toast.error(error.message)
+                setOpen(false);
+                toast.error(error.message)
             setIsSubmitting(false);
         });
     }
@@ -157,8 +163,8 @@ export default function Page1() {
                             : "Add"}
                     </Button>
                 </DialogFooter>
-            <ToastContainer1 autoClose={2000} />
             </Dialog>
+            <ToastContainer1 autoClose={2000} />
         </div>
     )
 }

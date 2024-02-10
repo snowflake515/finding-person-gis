@@ -1,5 +1,5 @@
-const Pool = require('pg').Pool
-const { body, checkSchema, validationResult } = require('express-validator');
+const Pool = require('pg').Pool;
+const { check, validationResult } = require('express-validator');
 
 const pool = new Pool({
     user: 'postgres',
@@ -38,7 +38,27 @@ const createProfile = (request, response) => {
         return res.status(400).json({ result: false });
     }
     const { userid, username, type, latitude, longitude } = request.body;
-
+    if (userid == '') {
+        response.status(201).send({
+            result: false,
+            message: "UserID should be fill!"
+        });
+        return;
+    }
+    if (username == '') {
+        response.status(201).send({
+            result: false,
+            message: "Username should be fill!"
+        });
+        return;
+    }
+    if (type == '') {
+        response.status(201).send({
+            result: false,
+            message: "Type should be fill!"
+        });
+        return;
+    }
 
     pool.query('SELECT * FROM profiles WHERE userid = $1', [userid], (error, results) => {
         console.log("1", results.rows.length);
@@ -51,7 +71,10 @@ const createProfile = (request, response) => {
                 response.status(201).send({result: true})
             })
         }else {
-            response.status(201).send({result: false})
+            response.status(201).send({
+                result: false,
+                message: "The userID already exists!"
+            })
         }
     })
 //

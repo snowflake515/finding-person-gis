@@ -23,4 +23,4 @@ export const ToastContainer1 = () => <ToastContainer
     pauseOnFocusLoss
     draggable
     pauseOnHover
-    theme="light"/>
+    theme="colored"/>
