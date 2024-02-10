@@ -10,14 +10,18 @@ import {
     Typography
 } from "@material-tailwind/react";
 import { useEffect } from "react";
+import MuiAlert from '@material-ui/lab/Alert';
 import LocationShow from "../components/LocationShow";
-
 import axios from 'axios';
 
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 const base_url = "http://localhost:3001/"
-console.log(process.env)
 export default function Page1() {
     const [open, setOpen] = React.useState(false);
+    const [showAlert, setShowAlert] = React.useState(false);
     const [data, setData] = React.useState({
             userid:"",
             username:"",
@@ -46,6 +50,10 @@ export default function Page1() {
 
         await axios(configuration)
             .then((result) => {
+                if (result.data.result) {
+                    setShowAlert(true);
+                    setOpen(false);
+                }
                 console.log(result);
                 setIsSubmitting(false);
             })
@@ -75,6 +83,7 @@ export default function Page1() {
         <div className="justify-center items-center flex flex-col p-4">
             <Button onClick={handleOpen}>Add me</Button>
             <LocationShow/>
+            {showAlert && <Alert severity="success">Create Profile Success! Please check your database !</Alert>}
             <Dialog open={open} size="xs" handler={handleOpen}>
                 <div className="flex items-center justify-between">
                     <DialogHeader className="flex flex-col items-start">

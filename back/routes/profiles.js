@@ -1,11 +1,13 @@
 const Pool = require('pg').Pool
+const { body, checkSchema, validationResult } = require('express-validator');
+
 const pool = new Pool({
     user: 'postgres',
     host: 'localhost',
     database: 'postgres',
     password: '123',
     port: 5432,
-  });
+});
 
 const getProfiles = (request, response) => {
     pool.query('SELECT * FROM profiles ORDER BY uid ASC', (error, results) => {
@@ -30,15 +32,19 @@ const getProfileById = (request, response) => {
 }
 
 const createProfile = (request, response) => {
-    console.log(request.body);
+    const errors = validationResult(request);
+
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ result: false });
+    }
     const { userid, username, type, latitude, longitude } = request.body;
-    
+
 
     pool.query('SELECT * FROM profiles WHERE userid = $1', [userid], (error, results) => {
         console.log("1", results.rows.length);
         if (results.rows.length == 0) {
             console.log("2");
-            pool.query('INSERT INTO profiles (userid, username, type, latitude, longitude) VALUES ($1, $2, $3, $4, $5)', [userid, username, type, latitude, longitude], (error, results) => {
+            pool.query('INSERT INTO profiles (userid, username, type, geom) VALUES ($1, $2, $3 ,ST_SetSRID(ST_MakePoint($4, $5), 4326))', [userid, username, type, latitude, longitude], (error, results) => {
                 if (error) {
                 throw error
                 }
