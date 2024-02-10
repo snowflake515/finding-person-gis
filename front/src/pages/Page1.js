@@ -9,27 +9,26 @@ import {
     // Textarea,
     Typography
 } from "@material-tailwind/react";
-import { useEffect } from "react";
-import MuiAlert from '@material-ui/lab/Alert';
+import {useEffect} from "react";
+import { notification, ToastContainer1 } from "../components/notification";
+import { ToastContainer, toast } from 'react-toastify';
 import LocationShow from "../components/LocationShow";
 import axios from 'axios';
 
-function Alert(props) {
-    return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
+// function Alert(props) {
+//     return <MuiAlert elevation={6} variant="filled" {...props}/>;
+// }
 
 const base_url = "http://localhost:3001/"
 export default function Page1() {
-    const [open, setOpen] = React.useState(false);
-    const [showAlert, setShowAlert] = React.useState(false);
-    const [data, setData] = React.useState({
-            userid:"",
-            username:"",
-            type:"",
-            latitude:0,
-            longitude:0
-        });
-    const [isSubmitting, setIsSubmitting] = React.useState(false);
+    const [open,
+        setOpen] = React.useState(false);
+    const [showAlert,
+        setShowAlert] = React.useState(false);
+    const [data,
+        setData] = React.useState({userid: "", username: "", type: "", latitude: 0, longitude: 0});
+    const [isSubmitting,
+        setIsSubmitting] = React.useState(false);
     const handleDataChange = (e) => {
         setData({
             ...data,
@@ -37,7 +36,7 @@ export default function Page1() {
         });
     }
     const handleOpen = () => setOpen(!open);
-    const handleSubmit = async (e) => {
+    const handleSubmit = async(e) => {
         console.log(e)
         setIsSubmitting(true);
 
@@ -48,42 +47,40 @@ export default function Page1() {
         };
         window.temp = base_url
 
-        await axios(configuration)
-            .then((result) => {
-                if (result.data.result) {
-                    setShowAlert(true);
-                    setOpen(false);
-                }
-                console.log(result);
-                setIsSubmitting(false);
-            })
-            .catch((error) => {
-                console.log(error);
-                setIsSubmitting(false);
-            });
+        await axios(configuration).then((result) => {
+            if (result.data.result) {
+                // setShowAlert(true);
+                toast("done");
+                setOpen(false);
+            }
+            console.log(result);
+            setIsSubmitting(false);
+        }).catch((error) => {
+            console.log(error);
+            toast.error(error.message)
+            setIsSubmitting(false);
+        });
     }
 
     useEffect(() => {
         // Get user's location
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            setData({
-             ...data,
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude
+        navigator
+            .geolocation
+            .getCurrentPosition((position) => {
+                setData({
+                    ...data,
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude
+                });
+            }, (error) => {
+                console.error('Error getting location:', error);
             });
-          },
-          (error) => {
-            console.error('Error getting location:', error);
-          }
-        );
-      }, []);
+    }, []);
 
     return (
         <div className="justify-center items-center flex flex-col p-4">
             <Button onClick={handleOpen}>Add me</Button>
-            <LocationShow/>
-            {showAlert && <Alert severity="success">Create Profile Success! Please check your database !</Alert>}
+            {/* <LocationShow/> {showAlert && <Alert severity="success">Create Profile Success! Please check your database !</Alert>} */}
             <Dialog open={open} size="xs" handler={handleOpen}>
                 <div className="flex items-center justify-between">
                     <DialogHeader className="flex flex-col items-start">
@@ -112,15 +109,27 @@ export default function Page1() {
                         <Typography className="-mb-1" color="blue-gray" variant="h6">
                             Username
                         </Typography>
-                        <Input label="Username" name="username"  value={data["username"]} onChange={handleDataChange}/>
+                        <Input
+                            label="Username"
+                            name="username"
+                            value={data["username"]}
+                            onChange={handleDataChange}/>
                         <Typography className="-mb-1" color="blue-gray" variant="h6">
                             UserID
                         </Typography>
-                        <Input label="UserID" name="userid" value={data["userid"]} onChange={handleDataChange}/>
+                        <Input
+                            label="UserID"
+                            name="userid"
+                            value={data["userid"]}
+                            onChange={handleDataChange}/>
                         <Typography className="-mb-1" color="blue-gray" variant="h6">
                             Type
                         </Typography>
-                        <Input label="Type" name="type" value={data["type"]} onChange={handleDataChange}/>
+                        <Input
+                            label="Type"
+                            name="type"
+                            value={data["type"]}
+                            onChange={handleDataChange}/>
                         <Typography className="-mb-1" color="blue-gray" variant="h6">
                             Latitude
                         </Typography>
@@ -135,15 +144,20 @@ export default function Page1() {
                     <Button variant="text" color="gray" onClick={handleOpen}>
                         cancel
                     </Button>
-                    {!isSubmitting?
-                    <Button variant="gradient" color="gray" onClick={handleSubmit} >
-                        Add
+                    <Button
+                        variant="gradient"
+                        color="gray"
+                        type="submit"
+                        onClick={handleSubmit}
+                        disabled={isSubmitting
+                        ? true
+                        : false}>
+                        {isSubmitting
+                            ? "..."
+                            : "Add"}
                     </Button>
-                    :
-                    <Button variant="gradient" color="gray" disabled>
-                        Add
-                    </Button>}
                 </DialogFooter>
+            <ToastContainer1 autoClose={2000} />
             </Dialog>
         </div>
     )

@@ -49,7 +49,7 @@ const links = [
         name: "add me",
         link: "/page1"
     }, {
-        name: "page2",
+        name: "My Location",
         link: "/page2"
     }, {
         name: "page3",
@@ -66,10 +66,10 @@ function NavList() {
                     key = {"header" + index}
                     variant="small"
                     color="blue-gray"
-                    className="p-1 font-medium">
+                    className="p-1 font-medium ">
                     <Link
                         to={link.link}
-                        className="flex items-center hover:text-blue-500 transition-colors">
+                        className="flex items-center hover:text-blue-500 transition-colors underline">
                         {link.name}
                     </Link>
                 </Typography>

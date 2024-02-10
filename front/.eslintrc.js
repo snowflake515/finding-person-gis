@@ -28,5 +28,6 @@ module.exports = {
         "react"
     ],
     "rules": {
+        "no-unused-vars": "off" // Disable checking for unused variables
     }
 }
