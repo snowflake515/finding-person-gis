@@ -3,8 +3,7 @@ import {Navbar, Collapse, Typography, IconButton} from "@material-tailwind/react
 import {Bars3Icon, XMarkIcon} from "@heroicons/react/24/outline";
 import {Link} from "react-router-dom"
 export default function Header() {
-    const [openNav,
-        setOpenNav] = React.useState(false);
+    const [openNav, setOpenNav] = React.useState(false);
 
     const handleWindowResize = () => window.innerWidth >= 540 && setOpenNav(false);
 
@@ -15,6 +14,7 @@ export default function Header() {
             window.removeEventListener("resize", handleWindowResize);
         };
     }, []);
+
     return (
         <Navbar className="mx-auto max-w-screen-xl px-6 py-3 rounded-xl">
             <div className="flex items-center justify-between text-blue-gray-900">
@@ -40,6 +40,7 @@ export default function Header() {
         </Navbar>
     )
 }
+
 const links = [
     {
         name: "Home",
@@ -56,6 +57,7 @@ const links = [
         link: "/page3"
     }
 ]
+
 function NavList() {
     return (
         <ul

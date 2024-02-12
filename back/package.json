@@ -1,22 +1,22 @@
 {
-  "name": "back",
-  "version": "0.0.0",
-  "private": true,
-  "scripts": {
-    "start": "nodemon ./bin/www"
-  },
-  "dependencies": {
-    "cookie-parser": "~1.4.4",
-    "cors": "^2.8.5",
-    "debug": "~2.6.9",
-    "express": "~4.16.1",
-    "express-validator": "^7.0.1",
-    "http-errors": "~1.6.3",
-    "jade": "~1.11.0",
-    "morgan": "~1.9.1",
-    "pg": "^8.11.3"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.3"
-  }
+	"name": "back",
+	"version": "0.0.0",
+	"private": true,
+	"scripts": {
+		"start": "nodemon ./bin/server.js"
+	},
+	"dependencies": {
+		"cookie-parser": "~1.4.4",
+		"cors": "^2.8.5",
+		"debug": "~2.6.9",
+		"express": "~4.16.1",
+		"express-validator": "^7.0.1",
+		"http-errors": "~1.6.3",
+		"jade": "~1.11.0",
+		"morgan": "~1.9.1",
+		"pg": "^8.11.3"
+	},
+	"devDependencies": {
+		"nodemon": "^3.0.3"
+	}
 }

@@ -77,7 +77,6 @@ const createProfile = (request, response) => {
             })
         }
     })
-//
 }
 
 const updateProfile = (request, response) => {
@@ -109,10 +108,48 @@ const deleteProfile = (request, response) => {
     })
 }
 
+const searchProfile = (request, response) => {
+    // console.log(request.body);
+    const { type, word, lati, long } = request.body
+    if (!type) {
+        pool.query('SELECT userid, username, type, ST_X(geom) AS longitude, ST_Y(geom) AS latitude, ST_Distance(geom, ST_SetSRID(ST_MakePoint($2, $1), 4326)) AS distance FROM profiles ORDER BY geom <-> ST_SetSRID(ST_MakePoint($2, $1), 4326) LIMIT 1', [lati, long], (error, results) => {
+            console.log(results.rows);
+            if (error) {
+                throw error
+            }
+            response.status(201).send({
+                result: true,
+                data: results.rows[0]
+            })
+        })
+    }else{
+        pool.query('SELECT userid, username, type, ST_X(geom) AS longitude, ST_Y(geom) AS latitude, ST_Distance(geom, ST_SetSRID(ST_MakePoint($2, $1), 4326)) AS distance FROM profiles where type=$3 ORDER BY geom <-> ST_SetSRID(ST_MakePoint($2, $1), 4326) LIMIT 1', [lati, long, word], (error, results) => {
+            console.log(results);
+            if (error) {
+                throw error
+            }
+            response.status(201).send({
+                result: true,
+                data: results
+            })
+        })
+    }
+    // const id = request.body.userid;
+
+    // pool.query('DELETE FROM profiles WHERE userid = $1', [id], (error, results) => {
+    //     if (error) {
+    //         response.status(200).json({result: false})
+    //         throw error
+    //     }
+    //     response.status(200).send({result: true})
+    // })
+}
+
 module.exports = {
-  getProfiles,
-  getProfileById,
-  createProfile,
-  updateProfile,
-  deleteProfile,
+    getProfiles,
+    getProfileById,
+    createProfile,
+    updateProfile,
+    deleteProfile,
+    searchProfile
 }
