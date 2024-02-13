@@ -47,13 +47,13 @@ const links = [
         link: "/"
     },
     {
-        name: "add me",
+        name: "Add Profile",
         link: "/page1"
     }, {
-        name: "My Location",
+        name: "Search User",
         link: "/page2"
     }, {
-        name: "page3",
+        name: "Update Profile",
         link: "/page3"
     }
 ]

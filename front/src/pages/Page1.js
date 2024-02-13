@@ -6,14 +6,17 @@ import {
     DialogBody,
     DialogFooter,
     Input,
-    // Textarea,
+    Select,
+    Option,
     Typography
 } from "@material-tailwind/react";
 import {useEffect} from "react";
 import { notification, ToastContainer1 } from "../components/notification";
 import { ToastContainer, toast } from 'react-toastify';
 import LocationShow from "../components/LocationShow";
+import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
+import {types} from "../global/type";
 
 // function Alert(props) {
 //     return <MuiAlert elevation={6} variant="filled" {...props}/>;
@@ -31,9 +34,16 @@ export default function Page1() {
             [e.target.name]: e.target.value
         });
     }
+
+    const onChange = (e) => {
+        setData({
+            ...data,
+            type: e
+        });
+    };
+    
     const handleOpen = () => setOpen(!open);
     const handleSubmit = async(e) => {
-        console.log(e)
         setIsSubmitting(true);
 
         const configuration = {
@@ -127,12 +137,18 @@ export default function Page1() {
                             onChange={handleDataChange}/>
                         <Typography className="-mb-1" color="blue-gray" variant="h6">
                             Type
-                        </Typography>
-                        <Input
-                            label="Type"
+                        </Typography>  
+                        <Select 
+                            label="Type" 
+                            onChange={onChange} 
                             name="type"
-                            value={data["type"]}
-                            onChange={handleDataChange}/>
+                            value={data["type"]}>
+                            {types.map((tt, i)=> {
+                                return (
+                                    <Option value={tt.value} key={i}>{tt.name}</Option>
+                                )}
+                            )}
+                        </Select>
                         <Typography className="-mb-1" color="blue-gray" variant="h6">
                             Latitude
                         </Typography>

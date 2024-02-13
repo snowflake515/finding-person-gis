@@ -10,7 +10,7 @@ const pool = new Pool({
 });
 
 const getProfiles = (request, response) => {
-    pool.query('SELECT * FROM profiles ORDER BY uid ASC', (error, results) => {
+    pool.query('SELECT userid, username, type, ST_X(geom) AS latitude, ST_Y(geom) AS longitude from profiles ORDER BY uid ASC', (error, results) => {
         if (error) {
         throw error
         }
@@ -112,8 +112,8 @@ const searchProfile = (request, response) => {
     // console.log(request.body);
     const { type, word, lati, long } = request.body
     if (!type) {
-        pool.query('SELECT userid, username, type, ST_X(geom) AS longitude, ST_Y(geom) AS latitude, ST_Distance(geom, ST_SetSRID(ST_MakePoint($2, $1), 4326)) AS distance FROM profiles ORDER BY geom <-> ST_SetSRID(ST_MakePoint($2, $1), 4326) LIMIT 1', [lati, long], (error, results) => {
-            console.log(results.rows);
+        console.log(lati, long);
+        pool.query('SELECT userid, username, type, ST_X(geom) AS latitude, ST_Y(geom) AS longitude, ST_Distance(geom, ST_SetSRID(ST_MakePoint($2, $1), 4326)) AS distance FROM ( SELECT userid, username, type, geom FROM profiles) AS filtered_data ORDER BY distance ASC LIMIT 1', [lati, long], (error, results) => {
             if (error) {
                 throw error
             }
@@ -123,15 +123,23 @@ const searchProfile = (request, response) => {
             })
         })
     }else{
-        pool.query('SELECT userid, username, type, ST_X(geom) AS longitude, ST_Y(geom) AS latitude, ST_Distance(geom, ST_SetSRID(ST_MakePoint($2, $1), 4326)) AS distance FROM profiles where type=$3 ORDER BY geom <-> ST_SetSRID(ST_MakePoint($2, $1), 4326) LIMIT 1', [lati, long, word], (error, results) => {
-            console.log(results);
+        pool.query('SELECT userid, username, type, ST_X(geom) AS latitude, ST_Y(geom) AS longitude, ST_Distance(geom, ST_SetSRID(ST_MakePoint($1, $2), 4326)) AS distance FROM profiles where type=$3 ORDER BY distance ASC LIMIT 1', [lati, long, word], (error, results) => {
+            // console.log(results.rows);
             if (error) {
                 throw error
+            }            
+            console.log(results.rows);
+            if (results.rows.length != 0) {
+                response.status(201).send({
+                    result: true,
+                    data: results.rows[0]
+                })
+            }else{
+                console.log("error")
+                response.status(201).send({
+                    result: false
+                })
             }
-            response.status(201).send({
-                result: true,
-                data: results
-            })
         })
     }
     // const id = request.body.userid;

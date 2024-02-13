@@ -1,8 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useRef  } from "react";
 import LocationShow from "../components/LocationShow";  
-import { Map } from "../components/Map";
-import { Radio, Typography, Input, Button } from "@material-tailwind/react";
+import Map from "../components/Map";
+import { Radio, Typography, Input, Button, Option } from "@material-tailwind/react";
+import { Select } from 'antd';
 import axios from 'axios';
+import {types} from "../global/type";
+import { notification, ToastContainer1 } from "../components/notification";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Icon() {
     return (
@@ -22,15 +27,14 @@ function Icon() {
 }
 
 export default function Page2() {
-    const [value, setValue] = useState(1);
     const [type, setType] = React.useState(false);
     const [word, setWord] = React.useState("");
     const [location, setLocation] = React.useState("current");
-    const onType = ({ target }) => setType(target.value);
+    const ref = useRef();
     const base_url = "http://localhost:3001/"
-    const onValue = (e) => {
-        setWord(e.target.value);
-    }
+    const onSelect = (e) => {
+        setWord(e);
+    };
     const onChange = (e) => {
         console.log('radio checked', e.target.value);
         if (e.target.value == 2) {
@@ -47,11 +51,14 @@ export default function Page2() {
             url:  base_url + 'profiles/search',
             data: {type: type, word: word, lati: localStorage.getItem('lati'), long: localStorage.getItem('long')}
         };
-
         await axios(configuration).then((result) => {
             if (result.data.result) {
-                console.log(result.data.data);
+                console.log(result.data.data, "parent-->>");
                 setLocation(result.data.data);
+                ref.current.log(result.data.data);
+            }else{
+                toast.error("Please select type again!");
+                console.log("error");
             }
             console.log(result);
         }).catch((error) => {
@@ -60,7 +67,7 @@ export default function Page2() {
     }
     return(
         <div>
-            <div className="flex gap-10 m-[10px] justify-start">
+            <div className="flex gap-10 m-[10px] justify-between">
                 <div className="flex gap-10">
                     <Radio
                         name="type"
@@ -71,12 +78,12 @@ export default function Page2() {
                         icon={<Icon />}
                         className="border-gray-900/10 bg-gray-900/5 p-0 transition-all hover:before:opacity-0"
                         label={
-                        <Typography
-                            color="blue-gray"
-                            className="font-normal text-blue-gray-400"
-                        >
-                            Location
-                        </Typography>
+                            <Typography
+                                color="blue-gray"
+                                className="font-normal text-blue-gray-400"
+                            >
+                                Location
+                            </Typography>
                         }
                     />
                     <Radio
@@ -87,28 +94,27 @@ export default function Page2() {
                         onChange={onChange}
                         className="border-gray-900/10 bg-gray-900/5 p-0 transition-all hover:before:opacity-0"
                         label={
-                        <Typography
-                            color="blue-gray"
-                            className="font-normal text-blue-gray-400"
-                        >
-                            Type
-                        </Typography>
+                            <Typography
+                                color="blue-gray"
+                                className="font-normal text-blue-gray-400"
+                            >
+                                Type
+                            </Typography>
                         }
+                    />
+                    <Select 
+                        // label="Type" 
+                        onChange={onSelect} 
+                        name="type"
+                        hidden={!type}
+                        value={word}
+                        options={types}
+                        style={{ marginTop: 3, minHeight: 40, minWidth: 200 }}
                     />
                 </div>
                 <div className="relative flex w-full max-w-[24rem]">
-                    <Input
-                        type="text"
-                        label="Input Type"
-                        className="pr-20"
-                        disabled={!type}
-                        onChange={onValue}
-                        value={word}
-                        containerProps={{
-                            className: "min-w-0",
-                        }}
-                    />
                     <Button
+                        color="blue"
                         size="sm"
                         onClick={search}
                         className="!absolute right-1 top-1 rounded"
@@ -117,7 +123,7 @@ export default function Page2() {
                     </Button>
                 </div>
             </div>
-            <Map location={location} />
+            <Map  ref={ref} />
         </div>
     )
 }
