@@ -79,6 +79,8 @@ export default function Page1() {
         navigator
             .geolocation
             .getCurrentPosition((position) => {
+                localStorage.setItem('lati', position.coords.latitude);
+                localStorage.setItem('long', position.coords.longitude);
                 setData({
                     ...data,
                     latitude: position.coords.latitude,
@@ -145,7 +147,7 @@ export default function Page1() {
                             value={data["type"]}>
                             {types.map((tt, i)=> {
                                 return (
-                                    <Option value={tt.value} key={i}>{tt.name}</Option>
+                                    <Option value={tt.value} key={i}>{tt.label}</Option>
                                 )}
                             )}
                         </Select>

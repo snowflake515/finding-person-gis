@@ -79,6 +79,19 @@ const createProfile = (request, response) => {
     })
 }
 
+const test = (request, response) => {
+
+    const {latitude, longitude} = request.body;
+    var time = "userid_" + new Date().getMinutes().toString() + new Date().getSeconds().toString();
+
+    pool.query('INSERT INTO profiles (userid, username, type, geom) VALUES ($1, $2, $3 ,ST_SetSRID(ST_MakePoint($4, $5), 4326))', [time, time, "singer", latitude, longitude], (error, results) => {
+        if (error) {
+        throw error
+        }
+        response.status(201).send({result: true})
+    })
+}
+
 const updateProfile = (request, response) => {
     const id = request.body.uid;
     const { uid, userid, username, type, latitude, longitude } = request.body
@@ -109,30 +122,42 @@ const deleteProfile = (request, response) => {
 }
 
 const searchProfile = (request, response) => {
-    // console.log(request.body);
-    const { type, word, lati, long } = request.body
-    if (!type) {
-        console.log(lati, long);
-        pool.query('SELECT userid, username, type, ST_X(geom) AS latitude, ST_Y(geom) AS longitude, ST_Distance(geom, ST_SetSRID(ST_MakePoint($2, $1), 4326)) AS distance FROM ( SELECT userid, username, type, geom FROM profiles) AS filtered_data ORDER BY distance ASC LIMIT 1', [lati, long], (error, results) => {
-            if (error) {
-                throw error
-            }
-            response.status(201).send({
-                result: true,
-                data: results.rows[0]
-            })
-        })
-    }else{
-        pool.query('SELECT userid, username, type, ST_X(geom) AS latitude, ST_Y(geom) AS longitude, ST_Distance(geom, ST_SetSRID(ST_MakePoint($1, $2), 4326)) AS distance FROM profiles where type=$3 ORDER BY distance ASC LIMIT 1', [lati, long, word], (error, results) => {
-            // console.log(results.rows);
+    const { radius, word, lati, long } = request.body;
+    console.log(lati, long);
+    var radius1 = radius;
+    var word1 = word;
+    if (radius1 == '') {
+        radius1 = 100000;
+    }
+    if (word1 == '') {
+        word1 = 'all';
+    }
+    if (word1 != 'all') {
+        pool.query('select * from (SELECT userid, username, type, ST_X(geom) AS latitude, ST_Y(geom) AS longitude, ST_Distance(ST_SetSRID(ST_MakePoint(ST_X(geom), ST_Y(geom)), 4326)::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography)/1000 AS distance FROM profiles) as retable where retable.type=$3 and retable.distance<$4 ORDER BY distance ASC', [lati, long, word1, radius1], (error, results) => {
             if (error) {
                 throw error
             }            
-            console.log(results.rows);
             if (results.rows.length != 0) {
                 response.status(201).send({
                     result: true,
-                    data: results.rows[0]
+                    data: results.rows
+                })
+            }else{
+                console.log("error")
+                response.status(201).send({
+                    result: false
+                })
+            }
+        })
+    }else {
+        pool.query('select * from (SELECT userid, username, type, ST_X(geom) AS latitude, ST_Y(geom) AS longitude, ST_Distance(ST_SetSRID(ST_MakePoint(ST_X(geom), ST_Y(geom)), 4326)::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography)/1000 AS distance FROM profiles) as retable where retable.distance<$3 ORDER BY distance ASC', [lati, long, radius1], (error, results) => {
+            if (error) {
+                throw error
+            }            
+            if (results.rows.length != 0) {
+                response.status(201).send({
+                    result: true,
+                    data: results.rows
                 })
             }else{
                 console.log("error")
@@ -142,15 +167,6 @@ const searchProfile = (request, response) => {
             }
         })
     }
-    // const id = request.body.userid;
-
-    // pool.query('DELETE FROM profiles WHERE userid = $1', [id], (error, results) => {
-    //     if (error) {
-    //         response.status(200).json({result: false})
-    //         throw error
-    //     }
-    //     response.status(200).send({result: true})
-    // })
 }
 
 module.exports = {
@@ -159,5 +175,6 @@ module.exports = {
     createProfile,
     updateProfile,
     deleteProfile,
-    searchProfile
+    searchProfile,
+    test
 }

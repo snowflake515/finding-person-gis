@@ -1,7 +1,7 @@
 import React, { useState, useRef  } from "react";
 import LocationShow from "../components/LocationShow";  
 import Map from "../components/Map";
-import { Radio, Typography, Input, Button, Option } from "@material-tailwind/react";
+import { Radio, Typography, Input, Button, Collapse, Card, CardBody } from "@material-tailwind/react";
 import { Select } from 'antd';
 import axios from 'axios';
 import {types} from "../global/type";
@@ -29,36 +29,47 @@ function Icon() {
 export default function Page2() {
     const [type, setType] = React.useState(false);
     const [word, setWord] = React.useState("");
-    const [location, setLocation] = React.useState("current");
-    const ref = useRef();
+    const [radius, setRadius] = React.useState("");
+    const [location, setLocation] = React.useState([]);
+    const [open, setOpen] = React.useState(false);
+    const TABLE_HEAD = ["No", "ID", "Distance"];
+    const ref = React.createRef();
     const base_url = "http://localhost:3001/"
     const onSelect = (e) => {
         setWord(e);
     };
-    const onChange = (e) => {
-        console.log('radio checked', e.target.value);
-        if (e.target.value == 2) {
-            setType(true);
-        }else{
-            setType(false);
-        }     
+    const onRadius = (e) => {
+        setRadius(e.target.value);
     };
+    
+    navigator
+        .geolocation
+        .getCurrentPosition((position) => {
+            localStorage.setItem('lati1', position.coords.latitude);
+            localStorage.setItem('long1', position.coords.longitude);
+        }, (error) => {
+            toast.error("Error while getting location: " + error.message)
+    });
     const search = async(e) => {
-        console.log(e)
-
+        var data = {radius: radius, word: word, lati: localStorage.getItem('lati'), long: localStorage.getItem('long')};
+        console.log(data, "seach-->>");
         const configuration = {
             method: 'post',
             url:  base_url + 'profiles/search',
-            data: {type: type, word: word, lati: localStorage.getItem('lati'), long: localStorage.getItem('long')}
+            data
         };
         await axios(configuration).then((result) => {
             if (result.data.result) {
                 console.log(result.data.data, "parent-->>");
                 setLocation(result.data.data);
+                if (!open) {
+                    setOpen(true)
+                }
                 ref.current.log(result.data.data);
             }else{
+                ref.current.log('error');
                 toast.error("Please select type again!");
-                console.log("error");
+                setOpen(false)
             }
             console.log(result);
         }).catch((error) => {
@@ -69,47 +80,32 @@ export default function Page2() {
         <div>
             <div className="flex gap-10 m-[10px] justify-between">
                 <div className="flex gap-10">
-                    <Radio
-                        name="type"
-                        defaultChecked
-                        onChange={onChange}
-                        value={1}
-                        ripple={false}
-                        icon={<Icon />}
-                        className="border-gray-900/10 bg-gray-900/5 p-0 transition-all hover:before:opacity-0"
-                        label={
-                            <Typography
-                                color="blue-gray"
-                                className="font-normal text-blue-gray-400"
-                            >
-                                Location
-                            </Typography>
-                        }
+                    <Typography
+                        color="blue-gray"
+                        className="font-normal text-black mt-2"
+                    >
+                        Radius:
+                    </Typography>     
+                    <Input 
+                        type="number" 
+                        label="Input Radius(40 Km)"
+                        onChange={onRadius}
+                        value={radius}
                     />
-                    <Radio
-                        name="type"
-                        ripple={false}
-                        icon={<Icon />}
-                        value={2}
-                        onChange={onChange}
-                        className="border-gray-900/10 bg-gray-900/5 p-0 transition-all hover:before:opacity-0"
-                        label={
-                            <Typography
-                                color="blue-gray"
-                                className="font-normal text-blue-gray-400"
-                            >
-                                Type
-                            </Typography>
-                        }
-                    />
+                    <Typography
+                        color="blue-gray"
+                        className="font-normal text-black mt-2"
+                    >
+                        Type:
+                    </Typography>
                     <Select 
                         // label="Type" 
                         onChange={onSelect} 
                         name="type"
-                        hidden={!type}
                         value={word}
                         options={types}
-                        style={{ marginTop: 3, minHeight: 40, minWidth: 200 }}
+                        defaultValue='all'
+                        style={{ marginTop: 2, minHeight: 40, minWidth: 200 }}
                     />
                 </div>
                 <div className="relative flex w-full max-w-[24rem]">
@@ -124,6 +120,72 @@ export default function Page2() {
                 </div>
             </div>
             <Map  ref={ref} />
+            <div className="fixed bottom-4 right-4 z-50">
+                <Collapse open={open}>
+                    <Card className="">
+                        <CardBody> 
+                            <table className="w-full min-w-max table-auto text-left">
+                                {/* <thead>
+                                    <tr>
+                                        {TABLE_HEAD.map((head) => (
+                                            <th
+                                                key={head}
+                                                className="border-b border-blue-gray-100 bg-blue-gray-50 p-3"
+                                            >
+                                                <Typography
+                                                    variant="small"
+                                                    color="blue-gray"
+                                                    className="font-normal leading-none opacity-70"
+                                                >
+                                                {head}
+                                                </Typography>
+                                            </th>
+                                        ))}
+                                    </tr>
+                                </thead> */}
+                                <tbody>
+                                    {location.map(({ userid, distance }, index) => {
+                                        const isLast = index === location.length - 1;
+                                        const classes = isLast ? "p-3" : "p-3 border-b border-blue-gray-50";
+                            
+                                        return (
+                                            <tr key={index}>
+                                                <td className={classes}>
+                                                    <Typography
+                                                        variant="small"
+                                                        color="blue-gray"
+                                                        className="font-normal"
+                                                    >
+                                                        {index+1}
+                                                    </Typography>
+                                                </td>
+                                                <td className={classes}>
+                                                    <Typography
+                                                        variant="small"
+                                                        color="blue-gray"
+                                                        className="font-normal"
+                                                    >
+                                                        {userid}
+                                                    </Typography>
+                                                </td>
+                                                <td className={classes}>
+                                                    <Typography
+                                                        variant="small"
+                                                        color="blue-gray"
+                                                        className="font-normal"
+                                                    >
+                                                        {Math.ceil(distance * 1000)} m
+                                                    </Typography>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </CardBody>
+                    </Card>
+                </Collapse>
+            </div>
         </div>
     )
 }

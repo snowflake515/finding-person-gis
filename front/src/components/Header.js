@@ -43,12 +43,8 @@ export default function Header() {
 
 const links = [
     {
-        name: "Home",
-        link: "/"
-    },
-    {
         name: "Add Profile",
-        link: "/page1"
+        link: "/"
     }, {
         name: "Search User",
         link: "/page2"

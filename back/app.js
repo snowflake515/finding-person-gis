@@ -25,6 +25,7 @@ app.post('/profiles/create', profiles.createProfile);
 app.post('/profiles/update', profiles.updateProfile);
 app.post('/profiles/delete', profiles.deleteProfile);
 app.post('/profiles/search', profiles.searchProfile);
+app.post('/profiles/test', profiles.test);
 
 app.use(function(req, res, next) {
   	next(createError(404));
