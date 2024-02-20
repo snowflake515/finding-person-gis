@@ -84,7 +84,7 @@ const test = (request, response) => {
     const {latitude, longitude} = request.body;
     var time = "userid_" + new Date().getMinutes().toString() + new Date().getSeconds().toString();
 
-    pool.query('INSERT INTO profiles (userid, username, type, geom) VALUES ($1, $2, $3 ,ST_SetSRID(ST_MakePoint($4, $5), 4326))', [time, time, "singer", latitude, longitude], (error, results) => {
+    pool.query('INSERT INTO profiles (userid, username, type, geom) VALUES ($1, $2, $3 ,ST_SetSRID(ST_MakePoint($4, $5), 4326))', [time, time, "dev", latitude, longitude], (error, results) => {
         if (error) {
         throw error
         }
@@ -123,6 +123,7 @@ const deleteProfile = (request, response) => {
 
 const searchProfile = (request, response) => {
     const { radius, word, lati, long } = request.body;
+    console.log("input--->>>");
     console.log(lati, long);
     var radius1 = radius;
     var word1 = word;
@@ -133,7 +134,7 @@ const searchProfile = (request, response) => {
         word1 = 'all';
     }
     if (word1 != 'all') {
-        pool.query('select * from (SELECT userid, username, type, ST_X(geom) AS latitude, ST_Y(geom) AS longitude, ST_Distance(ST_SetSRID(ST_MakePoint(ST_X(geom), ST_Y(geom)), 4326)::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography)/1000 AS distance FROM profiles) as retable where retable.type=$3 and retable.distance<$4 ORDER BY distance ASC', [lati, long, word1, radius1], (error, results) => {
+        pool.query('select * from (SELECT userid, username, type, ST_X(geom) AS latitude, ST_Y(geom) AS longitude, ST_Distance(ST_SetSRID(ST_MakePoint(ST_Y(geom), ST_X(geom)), 4326)::geography, ST_SetSRID(ST_MakePoint($2, $1), 4326)::geography)/1000 AS distance FROM profiles) as retable where retable.type=$3 and retable.distance<$4 ORDER BY distance ASC', [lati, long, word1, radius1], (error, results) => {
             if (error) {
                 throw error
             }            
@@ -150,7 +151,7 @@ const searchProfile = (request, response) => {
             }
         })
     }else {
-        pool.query('select * from (SELECT userid, username, type, ST_X(geom) AS latitude, ST_Y(geom) AS longitude, ST_Distance(ST_SetSRID(ST_MakePoint(ST_X(geom), ST_Y(geom)), 4326)::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography)/1000 AS distance FROM profiles) as retable where retable.distance<$3 ORDER BY distance ASC', [lati, long, radius1], (error, results) => {
+        pool.query('select * from (SELECT userid, username, type, ST_X(geom) AS latitude, ST_Y(geom) AS longitude, ST_Distance(ST_SetSRID(ST_MakePoint(ST_Y(geom), ST_X(geom)), 4326)::geography, ST_SetSRID(ST_MakePoint($2, $1), 4326)::geography)/1000 AS distance FROM profiles) as retable where retable.distance<$3 ORDER BY distance ASC', [lati, long, radius1], (error, results) => {
             if (error) {
                 throw error
             }            

@@ -144,7 +144,7 @@ export default function Page2() {
                                     </tr>
                                 </thead> */}
                                 <tbody>
-                                    {location.map(({ userid, distance }, index) => {
+                                    {location.map(({ username, distance }, index) => {
                                         const isLast = index === location.length - 1;
                                         const classes = isLast ? "p-3" : "p-3 border-b border-blue-gray-50";
                             
@@ -165,7 +165,7 @@ export default function Page2() {
                                                         color="blue-gray"
                                                         className="font-normal"
                                                     >
-                                                        {userid}
+                                                        {username}
                                                     </Typography>
                                                 </td>
                                                 <td className={classes}>
