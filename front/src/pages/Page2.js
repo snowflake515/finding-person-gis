@@ -52,7 +52,6 @@ export default function Page2() {
     });
     const search = async(e) => {
         var data = {radius: radius, word: word, lati: localStorage.getItem('lati'), long: localStorage.getItem('long')};
-        console.log(data, "seach-->>");
         const configuration = {
             method: 'post',
             url:  base_url + 'profiles/search',
@@ -60,7 +59,6 @@ export default function Page2() {
         };
         await axios(configuration).then((result) => {
             if (result.data.result) {
-                console.log(result.data.data, "parent-->>");
                 setLocation(result.data.data);
                 if (!open) {
                     setOpen(true)

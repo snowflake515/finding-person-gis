@@ -101,53 +101,29 @@ function DraggableMarker() {
         });
         return (
             <div>
-                {search_data.map((pos, i)=>{ 
-                    const customIcon = new L.Icon({
-                        iconUrl: 'marker-icon1.png',
-                        // iconSize: [55, 55], // size of the icon
-                        iconAnchor: [12.5, 45], // point of the icon which will correspond to marker's location
-                        popupAnchor: [0, 0] // point from which the popup should open relative to the iconAnchor
-                    });
-                    if (i == 0) {
-                        return(
-                            <Marker 
-                                key={i} 
-                                position={[pos.latitude, pos.longitude]} 
-                                ref={markerRef}
-                                icon={customIcon}
-                            >
-                                {popupOpen && (
-                                    <Tooltip direction="bottom" permanent>
-                                        <span>Username:{pos.username}<br/></span>
-                                        <span>Distance:{Math.ceil(pos.distance * 1000)} m<br/></span>
-                                    </Tooltip>
-                                )}
-                            </Marker>
-                        )
-                    }else{
-                        return(
-                            <Marker 
-                                key={i} 
-                                position={[pos.latitude, pos.longitude]} 
-                                ref={markerRef}
-                                icon={customIcon1}
-                            >
-                                {popupOpen && (
-                                    <Tooltip direction="bottom" permanent>
-                                        <span>Username:{pos.username}<br/></span>
-                                        <span>Distance:{Math.ceil(pos.distance * 1000)} m<br/></span>
-                                    </Tooltip>
-                                )}
-                            </Marker>
-                        )
-                    }
-                    }
-                )}
+                {search_data.map((pos, i)=>{
+                    return(
+                        <Marker 
+                            key={i} 
+                            position={[pos.latitude, pos.longitude]} 
+                            ref={markerRef}
+                            draggable={true}
+                            icon={customIcon1}
+                            eventHandlers={eventHandlers}
+                        >
+                            {popupOpen && (
+                                <Tooltip direction="bottom" permanent>
+                                    <span>Username:{pos.username}<br/></span>
+                                    <span>UserID:{pos.userid}<br/></span>
+                                    <span>Type:{pos.type}<br/></span>
+                                </Tooltip>
+                            )}
+                        </Marker>
+                    )
+                })}
                 <Marker 
-                    // key="me" 
                     position={center} 
                     ref={markerRef}
-                    // icon={customIcon1}
                     draggable={true}
                     eventHandlers={eventHandlers}
                 >
@@ -159,21 +135,21 @@ function DraggableMarker() {
     }
 }
 
-const Map = forwardRef(({ parentFunction }, ref) => {
+const Map = forwardRef((props, ref) => {
     const [zoom, setZoom] = useState(13);
-    const handleChildEvent = () => {
-        parentFunction(); // Call the parent function
-    };
+    // const handleChildEvent = () => {
+    //     parentFunction(); // Call the parent function
+    // };
     useImperativeHandle(ref, () => ({
         log(param1) {
+            console.log(param1, "-->>")
             if (param1 == 'error') {
                 search_flag = false;
-                console.log(position_mark, "2-->>");
                 position_mark = {lat: localStorage.getItem('lati'), lng: localStorage.getItem('long')};
             }else{
                 userid = param1[0].userid;
-                map.flyTo({lng: param1[0].longitude, lat: param1[0].latitude}, map.getZoom());
-                position_mark = {lng: param1[0].longitude, lat: param1[0].latitude};
+                map.flyTo({lng: localStorage.getItem("long"), lat: localStorage.getItem("lati")}, map.getZoom());
+                position_mark = {lng: localStorage.getItem("long"), lat: localStorage.getItem("lati")};
                 search_data = '';
                 search_data = param1;
                 search_flag = true;
@@ -189,8 +165,8 @@ const Map = forwardRef(({ parentFunction }, ref) => {
             zoom={zoom}
             scrollWheelZoom={true}
             attributionControl={true}
-            style={{position: 'fixed', width: 735, height: 500}}
-            className='w-screen h-[calc(100vh-64px)]'>
+            // style={{position: 'fixed', width: 735, height: 500}}
+            className='w-full h-full relative'>
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
@@ -200,9 +176,9 @@ const Map = forwardRef(({ parentFunction }, ref) => {
     );
 });
 
-Map.propTypes = {
-    parentFunction: PropTypes.func.isRequired, // Assuming parentFunction is a function
-};
+// Map.propTypes = {
+//     parentFunction: PropTypes.func.isRequired, // Assuming parentFunction is a function
+// };
 
 Map.displayName = "Map";
 

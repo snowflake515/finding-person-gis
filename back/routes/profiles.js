@@ -14,20 +14,27 @@ const getProfiles = (request, response) => {
         if (error) {
         throw error
         }
-        response.status(200).json(results.rows)
+        response.status(200).json({
+            result: true,
+            data: results.rows
+        })
     })
 }
 
 const getProfileById = (request, response) => {
-    const id = request.body.id;
+    console.log(request.body);
+    const id = request.body.userid;
     console.log(id);
 
-    pool.query('SELECT * FROM profiles WHERE userid = $1', [id], (error, results) => {
+    pool.query('SELECT userid, username, type, ST_X(geom) AS latitude, ST_Y(geom) AS longitude FROM profiles WHERE userid = $1', [id], (error, results) => {
         if (error) {
             response.status(200).json({result: false})
             throw error
         }
-        response.status(200).json({result: true})
+        response.status(200).json({
+            result: true,
+            data: results.rows
+        })
     })
 }
 
@@ -79,6 +86,8 @@ const createProfile = (request, response) => {
     })
 }
 
+
+
 const test = (request, response) => {
 
     const {latitude, longitude} = request.body;
@@ -93,12 +102,13 @@ const test = (request, response) => {
 }
 
 const updateProfile = (request, response) => {
-    const id = request.body.uid;
-    const { uid, userid, username, type, latitude, longitude } = request.body
+    const id = request.body.userid;
+    console.log(request.body)
+    const { userid, username, type, latitude, longitude } = request.body;
 
     pool.query(
-        'UPDATE profiles SET userid = $2, username = $3, type = $4, latitude = $5, longitude = $6 WHERE uid = $1',
-        [uid, userid, username, type, latitude, longitude],
+        'UPDATE profiles SET username = $2, type = $3, geom = ST_SetSRID(ST_MakePoint($4, $5), 4326) WHERE userid = $1',
+        [userid, username, type, latitude, longitude],
         (error, results) => {
             if (error) {
                 response.status(200).json({result: false})

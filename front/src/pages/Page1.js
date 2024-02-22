@@ -182,7 +182,7 @@ export default function Page1() {
                         </Typography>
                         <Input label="Type" value={lng} disabled/>
                         <Button variant="filled" color="gray" onClick={mapOpen}>
-                            Change location
+                            Confirm your location
                         </Button>
                     </div>
                 </DialogBody>
