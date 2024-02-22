@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef  }  from "react";
 import {
     Button,
     Dialog,
@@ -10,6 +10,7 @@ import {
     Option,
     Typography
 } from "@material-tailwind/react";
+import Map from "../components/SmallMap";
 import {useEffect} from "react";
 import { notification, ToastContainer1 } from "../components/notification";
 import { ToastContainer, toast } from 'react-toastify';
@@ -25,9 +26,13 @@ import {types} from "../global/type";
 const base_url = "http://localhost:3001/"
 export default function Page1() {
     const [open, setOpen] = React.useState(false);
+    const [map, setMap] = React.useState(false);
     const [showAlert, setShowAlert] = React.useState(false);
     const [data, setData] = React.useState({userid: "", username: "", type: "", latitude: 0, longitude: 0});
+    const [lng, setLng] = React.useState(localStorage.getItem("long"));
+    const [lati, setLati] = React.useState(localStorage.getItem("lati"));
     const [isSubmitting, setIsSubmitting] = React.useState(false);
+    const ref = useRef(null);
     const handleDataChange = (e) => {
         setData({
             ...data,
@@ -42,6 +47,19 @@ export default function Page1() {
         });
     };
     
+    const mapOpen = () => {
+        setMap(!map);
+    }
+    const mapSubmit = () => {
+        setLati(localStorage.getItem("lati"));
+        setLng(localStorage.getItem("long"));
+        setData({
+            ...data,
+            latitude: localStorage.getItem("lati"),
+            longitude: localStorage.getItem("long")
+        });
+        setMap(false);
+    }
     const handleOpen = () => setOpen(!open);
     const handleSubmit = async(e) => {
         setIsSubmitting(true);
@@ -73,6 +91,10 @@ export default function Page1() {
             setIsSubmitting(false);
         });
     }
+    
+    const handleParentFunction = () => {
+        console.log("Function called from child component");
+    };
 
     useEffect(() => {
         // Get user's location
@@ -95,7 +117,7 @@ export default function Page1() {
         <div className="justify-center items-center flex flex-col p-4">
             <Button onClick={handleOpen}>Add me</Button>
             {/* <LocationShow/> {showAlert && <Alert severity="success">Create Profile Success! Please check your database !</Alert>} */}
-            <Dialog open={open} size="xs" handler={handleOpen}>
+            <Dialog open={open} size="xs">
                 <div className="flex items-center justify-between">
                     <DialogHeader className="flex flex-col items-start">
                         {" "}
@@ -154,11 +176,14 @@ export default function Page1() {
                         <Typography className="-mb-1" color="blue-gray" variant="h6">
                             Latitude
                         </Typography>
-                        <Input label="Type" value={data["latitude"]} disabled/>
+                        <Input label="Type" value={lati} disabled/>
                         <Typography className="-mb-1" color="blue-gray" variant="h6">
                             Longitude
                         </Typography>
-                        <Input label="Type" value={data["longitude"]} disabled/>
+                        <Input label="Type" value={lng} disabled/>
+                        <Button variant="filled" color="gray" onClick={mapOpen}>
+                            Change location
+                        </Button>
                     </div>
                 </DialogBody>
                 <DialogFooter className="space-x-2">
@@ -170,6 +195,27 @@ export default function Page1() {
                         color="gray"
                         type="submit"
                         onClick={handleSubmit}
+                        disabled={isSubmitting? true : false}>
+                        {isSubmitting? "..." : "Add"}
+                    </Button>
+                </DialogFooter>
+            </Dialog>
+            <Dialog open={map} size="md" handler={mapOpen}>
+                <DialogHeader className="flex flex-col items-start">
+                    Change your location
+                </DialogHeader>
+                <DialogBody style={{height: 500}}>
+                    <Map ref={ref} parentFunction={handleParentFunction}/>
+                </DialogBody>
+                <DialogFooter className="space-x-2">
+                    <Button variant="text" color="gray" onClick={mapOpen}>
+                        cancel
+                    </Button>
+                    <Button
+                        variant="gradient"
+                        color="gray"
+                        type="submit"
+                        onClick={mapSubmit}
                         disabled={isSubmitting? true : false}>
                         {isSubmitting? "..." : "Add"}
                     </Button>

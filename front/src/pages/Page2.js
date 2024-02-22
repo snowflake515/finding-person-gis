@@ -119,7 +119,7 @@ export default function Page2() {
                     </Button>
                 </div>
             </div>
-            <Map  ref={ref} />
+            <Map ref={ref} />
             <div className="fixed bottom-4 right-4 z-50">
                 <Collapse open={open}>
                     <Card className="">
