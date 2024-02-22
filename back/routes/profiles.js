@@ -28,13 +28,17 @@ const getProfileById = (request, response) => {
 
     pool.query('SELECT userid, username, type, ST_X(geom) AS latitude, ST_Y(geom) AS longitude FROM profiles WHERE userid = $1', [id], (error, results) => {
         if (error) {
-            response.status(200).json({result: false})
             throw error
         }
-        response.status(200).json({
-            result: true,
-            data: results.rows
-        })
+        if (results.rows.length == 0) {
+            console.log("error");
+            response.status(200).json({result: false})
+        }else{
+            response.status(200).json({
+                result: true,
+                data: results.rows
+            })
+        }
     })
 }
 

@@ -3,7 +3,9 @@ import { notification, ToastContainer1 } from "../components/notification";
 import { ToastContainer, toast } from 'react-toastify';
 import LocationShow from "../components/LocationShow";
 import Map from "../components/SmallMap";
+import {types} from "../global/type";
 import { Input, Button, Collapse, Card, Typography, CardBody } from "@material-tailwind/react";
+import { Select } from 'antd';
 import axios from 'axios';
 
 const base_url = "http://localhost:3001/"
@@ -17,25 +19,33 @@ export default function Page3() {
    
     const toggleOpen = () => setOpenc((cur) => !cur);
     useEffect(() => { 
-        const kkk = async () => {
-            const configuration = {
-                method: 'get',
-                url:  base_url + 'profiles'
-            };
-
-            await axios(configuration).then((result) => {
-                if (result.data.result) {
-                    ref.current.log(result.data.data);
-                }else{
-                    toast.error("The user does not exist");
-                }
-            }).catch((error) => {
-                console.log(error);
-            });
-        }
         kkk();
     },[])
 
+    const onSelect = (e) => {
+        setData({
+            ...data,
+            type: e
+        });
+    };
+
+    const kkk = async () => {
+        console.log("kkk")
+        const configuration = {
+            method: 'get',
+            url:  base_url + 'profiles'
+        };
+
+        await axios(configuration).then((result) => {
+            if (result.data.result) {
+                ref.current.log(result.data.data, false);
+            }else{
+                toast.error("The user does not exist");
+            }
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
     const onUpdate = async(e) => {
         setData({
             ...data,
@@ -43,7 +53,14 @@ export default function Page3() {
             longitude: localStorage.getItem("long")
         });
         if (update) {
-            console.log(data);
+            if (data.type == "") {
+                toast.error("Require type!");
+                return;
+            }
+            if (data.username == "") {
+                toast.error("Require username!");
+                return;
+            }
             const configuration = {
                 method: 'post',
                 url: base_url + 'profiles/update',
@@ -53,12 +70,12 @@ export default function Page3() {
 
             await axios(configuration).then((result) => {
                 if (result.data.result) {
-                    toast("Updating profile is successful");
+                    toast("Updated profile is successful");
                     setUpdate(!update);
                     toggleOpen();
                 }else{
                     setUpdate(!update);
-                    toast.error(result.data.message);
+                    toast.error("Please check update field!");
                     toggleOpen();
                 }
             }).catch((error) => {
@@ -78,29 +95,36 @@ export default function Page3() {
     }
 
     const search = async(e) => {
-        var data = {userid: userid};
-        const configuration = {
-            method: 'post',
-            url:  base_url + 'profiles/getId',
-            data
-        };
-        await axios(configuration).then((result) => {
-            if (result.data.result) {
-                ref.current.log(result.data.data);
-                setData({
-                    ...data,
-                    userid: result.data.data[0].userid,
-                    username: result.data.data[0].username,
-                    type: result.data.data[0].type
-                });
-                toggleOpen();
-            }else{
-                ref.current.log('error');
-                toast.error("Please select type again!");
-            }
-        }).catch((error) => {
-            console.log(error);
-        });
+        if (userid) {
+            var data = {userid: userid};
+            const configuration = {
+                method: 'post',
+                url:  base_url + 'profiles/getId',
+                data
+            };
+            await axios(configuration).then((result) => {
+                if (result.data.result) {
+                    localStorage.setItem("lati", result.data.data[0].latitude);
+                    localStorage.setItem("long", result.data.data[0].longitude);
+                    ref.current.log(result.data.data, true);
+                    setData({
+                        ...data,
+                        userid: result.data.data[0].userid,
+                        username: result.data.data[0].username,
+                        type: result.data.data[0].type
+                    });
+                    setOpenc(true);
+                }else{
+                    toast.error("Please select type again!");
+                    ref.current.log('error', true);
+                }
+            }).catch((error) => {
+                console.log(error);
+            });
+        }else{
+            window.location.reload();
+            setOpenc(false);
+        }
     }
     const TABLE_HEAD = ["UserID", "UserName", "Type", "Action"]
 
@@ -121,8 +145,7 @@ export default function Page3() {
                         />
                         <Button
                             size="sm"
-                            color={userid ? "gray" : "blue-gray"}
-                            disabled={!userid}
+                            color="gray"
                             onClick={search}
                             className="!absolute right-1 top-1 rounded"
                         >
@@ -182,12 +205,14 @@ export default function Page3() {
                                             </td>
                                             <td className="p-3 border-b border-blue-gray-50">
                                                 {update? 
-                                                    <input
-                                                        value={data.type}
-                                                        size={10}
+                                                    <Select 
+                                                        // label="Type" 
+                                                        onChange={onSelect} 
                                                         name="type"
-                                                        onChange={onData}
-                                                        className="border text-center"
+                                                        value={data.type}
+                                                        options={types}
+                                                        defaultValue='all'
+                                                        style={{ maxHeight: 26, maxWidth: 140 }}
                                                     /> : 
                                                     <Typography
                                                         variant="small"
@@ -209,6 +234,7 @@ export default function Page3() {
                     </Collapse>
                 </div>         
             </div>
+            <ToastContainer1 />
             <div className="p-8 basis-2/3">
                 <Map ref={ref} />
             </div>

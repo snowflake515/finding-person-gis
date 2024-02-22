@@ -13,10 +13,12 @@ var map;
 var position_mark = center;
 var userid = "My location";
 var search_flag = false;
+var page3_flag = true;
 var search_data;
 var markerRef;
 
 function DraggableMarker() {
+    console.log("reflesh2!!!");
     const [position, setPosition] = useState(center);
     const [popupOpen, setPopupOpen] = useState(false);
     markerRef = useRef(null);
@@ -93,6 +95,7 @@ function DraggableMarker() {
             </Marker>
         );
     }else{
+        console.log("normal_search", "2-->>");
         const customIcon1 = new L.Icon({
             iconUrl: 'marker-icon2.png',
             // iconSize: [50, 89], // size of the icon
@@ -121,15 +124,6 @@ function DraggableMarker() {
                         </Marker>
                     )
                 })}
-                <Marker 
-                    position={center} 
-                    ref={markerRef}
-                    draggable={true}
-                    eventHandlers={eventHandlers}
-                >
-                    lat:{position_mark.lat}<br/>
-                    lng:{position_mark.lng}<br/>
-                </Marker>
             </div>
         )
     }
@@ -141,24 +135,28 @@ const Map = forwardRef((props, ref) => {
     //     parentFunction(); // Call the parent function
     // };
     useImperativeHandle(ref, () => ({
-        log(param1) {
-            console.log(param1, "-->>")
+        log(param1, param2) {
             if (param1 == 'error') {
                 search_flag = false;
                 position_mark = {lat: localStorage.getItem('lati'), lng: localStorage.getItem('long')};
             }else{
                 userid = param1[0].userid;
+                page3_flag = param2;
+                console.log(param1, param2);
                 map.flyTo({lng: localStorage.getItem("long"), lat: localStorage.getItem("lati")}, map.getZoom());
                 position_mark = {lng: localStorage.getItem("long"), lat: localStorage.getItem("lati")};
-                search_data = '';
                 search_data = param1;
-                search_flag = true;
+                if (param2) {
+                    search_flag = false
+                }else{
+                    search_flag = true;
+                }
                 setZoom(13);
             }
         }
     }));
     center = {lat: localStorage.getItem('lati'), lng: localStorage.getItem('long')};
-
+    console.log("reflesh1!!!");
     return (
         <MapContainer
             center={center}
