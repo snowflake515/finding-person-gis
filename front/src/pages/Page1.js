@@ -97,7 +97,6 @@ export default function Page1() {
     };
 
     useEffect(() => {
-        // Get user's location
         navigator
             .geolocation
             .getCurrentPosition((position) => {

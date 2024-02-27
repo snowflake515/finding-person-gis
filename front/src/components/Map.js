@@ -6,6 +6,9 @@ import { useMapEvents } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import { latLng } from 'leaflet';
 import axios from 'axios';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css';
+import 'leaflet-defaulticon-compatibility';
 
 var center = {lat: localStorage.getItem('lati1'), lng: localStorage.getItem('long1')};
 
@@ -178,6 +181,7 @@ const Map = forwardRef((props, ref) => {
             }
         }
     }));
+////
     center = {lat: localStorage.getItem('lati'), lng: localStorage.getItem('long')};
 
     return (

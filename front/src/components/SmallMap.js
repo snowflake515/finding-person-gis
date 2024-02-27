@@ -6,6 +6,9 @@ import { useMapEvents } from 'react-leaflet';
 import PropTypes from 'prop-types';
 import { latLng } from 'leaflet';
 import axios from 'axios';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css';
+import 'leaflet-defaulticon-compatibility';
 
 var center = {lat: localStorage.getItem('lati1'), lng: localStorage.getItem('long1')};
 
@@ -162,7 +165,7 @@ const Map = forwardRef((props, ref) => {
             center={center}
             zoom={zoom}
             scrollWheelZoom={true}
-            attributionControl={true}
+            attributionControl={false}
             // style={{position: 'fixed', width: 735, height: 500}}
             className='w-full h-full relative'>
             <TileLayer

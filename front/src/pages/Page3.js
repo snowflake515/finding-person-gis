@@ -4,7 +4,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import LocationShow from "../components/LocationShow";
 import Map from "../components/SmallMap";
 import {types} from "../global/type";
-import { Input, Button, Collapse, Card, Typography, CardBody } from "@material-tailwind/react";
+import { PencilIcon, CheckIcon, CheckCircleIcon  } from "@heroicons/react/24/solid";
+import { Input, Button, Collapse, Card, Typography, CardBody, Tooltip, IconButton } from "@material-tailwind/react";
 import { Select } from 'antd';
 import axios from 'axios';
 
@@ -75,7 +76,7 @@ export default function Page3() {
                     toggleOpen();
                 }else{
                     setUpdate(!update);
-                    toast.error("Please check update field!");
+                    toast.error("Please check updated field!");
                     toggleOpen();
                 }
             }).catch((error) => {
@@ -115,8 +116,7 @@ export default function Page3() {
                     });
                     setOpenc(true);
                 }else{
-                    toast.error("Please select type again!");
-                    ref.current.log('error', true);
+                    toast.error("No exist the user!");
                 }
             }).catch((error) => {
                 console.log(error);
@@ -223,8 +223,13 @@ export default function Page3() {
                                                     </Typography>
                                                 }  
                                             </td>
-                                            <td className="p-3 border-b border-blue-gray-50">
-                                                <Button variant="outlined" onClick={onUpdate}>Update</Button>
+                                            <td  className="p-3 border-b border-blue-gray-50">
+                                                <IconButton variant="text">
+                                                    {update? 
+                                                        <CheckCircleIcon className="h-8 w-8" color="green" onClick={onUpdate}/> :
+                                                        <PencilIcon className="h-4 w-4" onClick={onUpdate}/>
+                                                    }
+                                                </IconButton>
                                             </td>
                                         </tr>
                                     </tbody>
