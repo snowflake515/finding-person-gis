@@ -12,9 +12,9 @@ import axios from 'axios';
 const base_url = "http://localhost:3001/"
 export default function Page3() {
     const ref = React.createRef();
-    const [userid, setUserid] = React.useState("");
+    const [searchId, setSearchId] = React.useState("");
     const [data, setData] = React.useState({userid: "", username: "", type: "", latitude: "", longitude: ""});
-    const onChange = ({ target }) => setUserid(target.value);
+    const onChange = ({ target }) => setSearchId(target.value);
     const [openc, setOpenc] = React.useState(false);
     const [update, setUpdate] = React.useState(false);
    
@@ -31,7 +31,6 @@ export default function Page3() {
     };
 
     const kkk = async () => {
-        console.log("kkk")
         const configuration = {
             method: 'get',
             url:  base_url + 'profiles'
@@ -44,16 +43,16 @@ export default function Page3() {
                 toast.error("The user does not exist");
             }
         }).catch((error) => {
-            console.log(error);
         });
     }
     const onUpdate = async(e) => {
-        setData({
-            ...data,
-            latitude: localStorage.getItem("lati"),
-            longitude: localStorage.getItem("long")
-        });
         if (update) {
+            console.log("update--->>>", localStorage.getItem("lati"));
+            setData({
+                ...data,
+                latitude: localStorage.getItem("lati"),
+                longitude: localStorage.getItem("long")
+            });
             if (data.type == "") {
                 toast.error("Require type!");
                 return;
@@ -62,10 +61,24 @@ export default function Page3() {
                 toast.error("Require username!");
                 return;
             }
+            // if (data.latitude == null) {
+            //     toast.error("Require latitude!");
+            //     return;
+            // }
+            // if (data.longitude == null) {
+            //     toast.error("Require longitude!");
+            //     return;
+            // }
             const configuration = {
                 method: 'post',
                 url: base_url + 'profiles/update',
-                data
+                data : {
+                    userid: data.userid,
+                    username: data.username,
+                    type: data.type,
+                    latitude: localStorage.getItem("lati"),
+                    longitude: localStorage.getItem("long")
+                }
             };
             window.temp = base_url
 
@@ -80,7 +93,6 @@ export default function Page3() {
                     toggleOpen();
                 }
             }).catch((error) => {
-                console.log(error);
                 toast.error(error.message)
             });
         }
@@ -88,7 +100,6 @@ export default function Page3() {
     }
 
     const onData = (e) => {
-        console.log(e);
         setData({
             ...data,
             [e.target.name]: e.target.value
@@ -96,8 +107,8 @@ export default function Page3() {
     }
 
     const search = async(e) => {
-        if (userid) {
-            var data = {userid: userid};
+        if (searchId) {
+            var data = {userid: searchId};
             const configuration = {
                 method: 'post',
                 url:  base_url + 'profiles/getId',
@@ -107,6 +118,7 @@ export default function Page3() {
                 if (result.data.result) {
                     localStorage.setItem("lati", result.data.data[0].latitude);
                     localStorage.setItem("long", result.data.data[0].longitude);
+                    console.log(result.data.data[0]);
                     ref.current.log(result.data.data, true);
                     setData({
                         ...data,
@@ -126,6 +138,7 @@ export default function Page3() {
             setOpenc(false);
         }
     }
+
     const TABLE_HEAD = ["UserID", "UserName", "Type", "Action"]
 
     return(
@@ -136,7 +149,7 @@ export default function Page3() {
                         <Input
                             type="text"
                             label="UserID"
-                            value={userid}
+                            value={searchId}
                             onChange={onChange}
                             className="pr-20"
                             containerProps={{

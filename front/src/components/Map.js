@@ -39,7 +39,6 @@ function DraggableMarker() {
             localStorage.setItem('long', e.latlng.lng);
         },
         zoomend: (event) => {
-            console.log('Zoom level changed to:', event.target.getZoom());
             if (event.target.getZoom() >= 15) {
                 markerRef.current.openPopup();
                 setPopupOpen(true);
@@ -80,12 +79,18 @@ function DraggableMarker() {
     );
 
     if (!search_flag) {
-        console.log(position_mark, "1-->>");
+        const customIcon = new L.Icon({
+            iconUrl: 'marker-icon.png',
+            // iconSize: [50, 89], // size of the icon
+            iconAnchor: [12.5, 45], // point of the icon which will correspond to marker's location
+            popupAnchor: [0, 0] // point from which the popup should open relative to the iconAnchor
+        });
         return (
             <Marker
                 draggable={true}
                 eventHandlers={eventHandlers}
                 position={position_mark}
+                icon={customIcon}
                 ref={markerRef}  
             >
                 <Popup minWidth={90} autoClose={false} onClose={() => setPopupOpen(false)}>
@@ -167,7 +172,6 @@ const Map = forwardRef((props, ref) => {
         log(param1) {
             if (param1 == 'error') {
                 search_flag = false;
-                console.log(position_mark, "2-->>");
                 position_mark = {lat: localStorage.getItem('lati'), lng: localStorage.getItem('long')};
             }else{
                 userid = param1[0].userid;

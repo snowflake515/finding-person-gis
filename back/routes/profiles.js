@@ -66,14 +66,14 @@ const createProfile = (request, response) => {
     if (latitude == '' || latitude == null) {
         response.status(201).send({
             result: false,
-            message: "GEO should be fill!"
+            message: "Please check your location again!"
         });
         return;
     }
     if (longitude == '' || longitude == null) {
         response.status(201).send({
             result: false,
-            message: "GEO should be fill!"
+            message: "Please check your location again!"
         });
         return;
     }
@@ -120,11 +120,9 @@ const test = (request, response) => {
 }
 
 const updateProfile = (request, response) => {
-    const id = request.body.userid;
+    // const id = request.body.userid;
     console.log(request.body)
     const { userid, username, type, latitude, longitude } = request.body;
-    console.log(latitude, "-->>");
-    console.log(longitude, "-->>");
     if (userid == '') {
         response.status(201).send({
             result: false,
@@ -142,14 +140,14 @@ const updateProfile = (request, response) => {
     if (latitude == null) {
         response.status(201).send({
             result: false,
-            message: "GEO should be fill!"
+            message: "Please check your location again!"
         });
         return;
     }
     if (longitude == null) {
         response.status(201).send({
             result: false,
-            message: "GEO should be fill!"
+            message: "Please check your location again!"
         });
         return;
     }

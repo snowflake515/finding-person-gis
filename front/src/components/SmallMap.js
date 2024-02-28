@@ -7,14 +7,14 @@ import PropTypes from 'prop-types';
 import { latLng } from 'leaflet';
 import axios from 'axios';
 import 'leaflet/dist/leaflet.css';
-// import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css';
-// import 'leaflet-defaulticon-compatibility';
+import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css';
+import 'leaflet-defaulticon-compatibility';
 
 var center = {lat: localStorage.getItem('lati1'), lng: localStorage.getItem('long1')};
 
 var map;
 var position_mark = center;
-var userid = "tion";
+var userid = "ME";
 var search_flag = false;
 var page3_flag = true;
 var search_data;
@@ -40,14 +40,14 @@ function DraggableMarker() {
             localStorage.setItem('long', e.latlng.lng);
         },
         zoomend: (event) => {
-            console.log('Zoom level changed to:', event.target.getZoom());
-            if (event.target.getZoom() >= 15) {
-                markerRef.current.openPopup();
-                setPopupOpen(true);
-            }else{
-                setPopupOpen(false);
-                markerRef.current.closePopup();
-            }
+            // console.log('Zoom level changed to:', event.target.getZoom());
+            // if (event.target.getZoom() >= 15) {
+            //     markerRef.current.openPopup();
+            //     setPopupOpen(true);
+            // }else{
+            //     setPopupOpen(false);
+            //     markerRef.current.closePopup();
+            // }
         },
     })
 
@@ -81,7 +81,7 @@ function DraggableMarker() {
     );
 
     if (!search_flag) {
-        const customIcon = new L.Icon({
+        const customIcon1 = new L.Icon({
             iconUrl: 'marker-icon.png',
             // iconSize: [50, 89], // size of the icon
             iconAnchor: [12.5, 45], // point of the icon which will correspond to marker's location
@@ -92,10 +92,10 @@ function DraggableMarker() {
                 draggable={true}
                 eventHandlers={eventHandlers}
                 position={position_mark}
-                icon={customIcon}
+                icon={customIcon1}
                 ref={markerRef}  
             >
-                <Popup minWidth={90} autoClose={false} onClose={() => setPopupOpen(false)}>
+                <Popup minWidth={90} autoClose={false} offset={[0, -42]} onClose={() => setPopupOpen(false)}>
                     userid: {userid}<br/>
                     lat:{position_mark.lat}<br/>
                     lng:{position_mark.lng}<br/>
