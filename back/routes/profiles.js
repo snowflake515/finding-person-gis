@@ -63,6 +63,20 @@ const createProfile = (request, response) => {
         });
         return;
     }
+    if (latitude == '' || latitude == null) {
+        response.status(201).send({
+            result: false,
+            message: "GEO should be fill!"
+        });
+        return;
+    }
+    if (longitude == '' || longitude == null) {
+        response.status(201).send({
+            result: false,
+            message: "GEO should be fill!"
+        });
+        return;
+    }
     if (type == '') {
         response.status(201).send({
             result: false,
@@ -109,6 +123,36 @@ const updateProfile = (request, response) => {
     const id = request.body.userid;
     console.log(request.body)
     const { userid, username, type, latitude, longitude } = request.body;
+    console.log(latitude, "-->>");
+    console.log(longitude, "-->>");
+    if (userid == '') {
+        response.status(201).send({
+            result: false,
+            message: "UserID should be fill!"
+        });
+        return;
+    }
+    if (username == '') {
+        response.status(201).send({
+            result: false,
+            message: "Username should be fill!"
+        });
+        return;
+    }
+    if (latitude == null) {
+        response.status(201).send({
+            result: false,
+            message: "GEO should be fill!"
+        });
+        return;
+    }
+    if (longitude == null) {
+        response.status(201).send({
+            result: false,
+            message: "GEO should be fill!"
+        });
+        return;
+    }
 
     pool.query(
         'UPDATE profiles SET username = $2, type = $3, geom = ST_SetSRID(ST_MakePoint($4, $5), 4326) WHERE userid = $1',

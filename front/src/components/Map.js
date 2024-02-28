@@ -89,7 +89,6 @@ function DraggableMarker() {
                 ref={markerRef}  
             >
                 <Popup minWidth={90} autoClose={false} onClose={() => setPopupOpen(false)}>
-                    userid: {userid}<br/>
                     lat:{position_mark.lat}<br/>
                     lng:{position_mark.lng}<br/>
                 </Popup>

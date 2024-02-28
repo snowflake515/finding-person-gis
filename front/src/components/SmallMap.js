@@ -7,21 +7,20 @@ import PropTypes from 'prop-types';
 import { latLng } from 'leaflet';
 import axios from 'axios';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css';
-import 'leaflet-defaulticon-compatibility';
+// import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css';
+// import 'leaflet-defaulticon-compatibility';
 
 var center = {lat: localStorage.getItem('lati1'), lng: localStorage.getItem('long1')};
 
 var map;
 var position_mark = center;
-var userid = "My location";
+var userid = "tion";
 var search_flag = false;
 var page3_flag = true;
 var search_data;
 var markerRef;
 
 function DraggableMarker() {
-    console.log("reflesh2!!!");
     const [position, setPosition] = useState(center);
     const [popupOpen, setPopupOpen] = useState(false);
     markerRef = useRef(null);
@@ -82,12 +81,18 @@ function DraggableMarker() {
     );
 
     if (!search_flag) {
-        console.log(position_mark, "1-->>");
+        const customIcon = new L.Icon({
+            iconUrl: 'marker-icon.png',
+            // iconSize: [50, 89], // size of the icon
+            iconAnchor: [12.5, 45], // point of the icon which will correspond to marker's location
+            popupAnchor: [0, 0] // point from which the popup should open relative to the iconAnchor
+        });
         return (
             <Marker
                 draggable={true}
                 eventHandlers={eventHandlers}
                 position={position_mark}
+                icon={customIcon}
                 ref={markerRef}  
             >
                 <Popup minWidth={90} autoClose={false} onClose={() => setPopupOpen(false)}>
@@ -98,7 +103,6 @@ function DraggableMarker() {
             </Marker>
         );
     }else{
-        console.log("normal_search", "2-->>");
         const customIcon1 = new L.Icon({
             iconUrl: 'marker-icon2.png',
             // iconSize: [50, 89], // size of the icon
@@ -159,7 +163,6 @@ const Map = forwardRef((props, ref) => {
         }
     }));
     center = {lat: localStorage.getItem('lati'), lng: localStorage.getItem('long')};
-    console.log("reflesh1!!!");
     return (
         <MapContainer
             center={center}
